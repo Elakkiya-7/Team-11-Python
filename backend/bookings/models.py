@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import User
+from django.conf import settings
 from resources.models import Resource
 
 class Booking(models.Model):
@@ -10,7 +10,7 @@ class Booking(models.Model):
         ('REJECTED', 'Rejected'),
     ]
 
-    userId = models.ForeignKey(User, on_delete=models.CASCADE)
+    userId = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     resourceId = models.ForeignKey(Resource, on_delete=models.CASCADE)
     bookingDate = models.DateField()
     timeSlot = models.CharField(max_length=50)

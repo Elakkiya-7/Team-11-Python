@@ -1,43 +1,86 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../api/axiosInstance";
 import Navbar from "../components/Navbar";
-import { styles } from "../styles";
 
 const AdminApproval = () => {
-  const [bookings, setBookings] = useState([
-    { id: 1, student: "John", resource: "Lab 1", status: "PENDING_ADMIN" },
-  ]);
+  const [bookings, setBookings] = useState([]);
 
-  const approve = (id) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "APPROVED" } : b
-      )
-    );
+  // Fetch all pending bookings
+  const fetchBookings = async () => {
+    try {
+      const res = await axiosInstance.get("bookings/");
+      setBookings(res.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const reject = (id) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "REJECTED" } : b
-      )
-    );
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const updateStatus = async (id, status) => {
+    try {
+      await axiosInstance.patch(`bookings/${id}/`, {
+        status: status,
+      });
+
+      fetchBookings(); // refresh list
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <>
-      <Navbar role="admin" />
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2>Admin Approvals</h2>
+      <Navbar />
+      <div style={{ padding: "30px" }}>
+        <h2>Admin Booking Approval</h2>
 
-          {bookings.map((b) => (
-            <div key={b.id}>
-              <p>{b.student} - {b.resource}</p>
-              <button onClick={() => approve(b.id)}>Approve</button>
-              <button onClick={() => reject(b.id)}>Reject</button>
-            </div>
-          ))}
-        </div>
+        <table border="1" width="100%" cellPadding="10">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Resource</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {bookings.map((b) => (
+              <tr key={b.id}>
+                <td>{b.userId}</td>
+                <td>{b.resourceId}</td>
+                <td>{b.bookingDate}</td>
+                <td>{b.status}</td>
+
+                <td>
+                  {b.status === "PENDING" && (
+                    <>
+                      <button
+                        onClick={() =>
+                          updateStatus(b.id, "APPROVED")
+                        }
+                      >
+                        Approve
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          updateStatus(b.id, "REJECTED")
+                        }
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

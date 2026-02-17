@@ -1,13 +1,32 @@
-import axios from "../api/axiosInstance";
+import React, { useEffect, useState } from "react";
+import { getUsers } from "../services/userService";
 
-export const registerStudent = (data) => {
-  return axios.post("/api/auth/student-register/", data);
-};
+function Users() {
+  const [users, setUsers] = useState([]);
 
-export const loginStudent = (data) => {
-  return axios.post("/api/auth/student-login/", data);
-};
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-export const loginStaff = (data) => {
-  return axios.post("/api/auth/staff-login/", data);
-};
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>User List</h2>
+      {users.map(user => (
+        <div key={user.id}>
+          {user.name} - {user.role}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default Users;

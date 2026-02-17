@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from datetime import datetime
 from .models import Booking
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -8,13 +9,10 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        user = data['userId']
-        resource = data['resourceId']
+        booking_date = data['bookingDate']
 
-        if user.status != "ACTIVE":
-            raise serializers.ValidationError("User is not ACTIVE.")
-
-        if resource.status != "AVAILABLE":
-            raise serializers.ValidationError("Resource is not AVAILABLE.")
+        # Prevent past date booking
+        if booking_date < datetime.today().date():
+            raise serializers.ValidationError("Cannot book past dates.")
 
         return data
