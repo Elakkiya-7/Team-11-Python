@@ -1,45 +1,56 @@
-import React, { useState } from "react";
-import Navbar from "../components/Navbar";
+import React from "react";
+import Layout from "../components/Layout";
 import { styles } from "../styles";
 
-const StaffApproval = () => {
-  const [bookings, setBookings] = useState([
-    { id: 1, student: "John", resource: "Lab 1", status: "PENDING_STAFF" },
-  ]);
-
-  const approve = (id) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "PENDING_ADMIN" } : b
-      )
-    );
+const StaffApproval = ({ bookings, setBookings }) => {
+  const handleApprove = (index) => {
+    const updated = [...bookings];
+    updated[index].status = "PENDING_ADMIN";
+    setBookings(updated);
   };
 
-  const reject = (id) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "REJECTED" } : b
-      )
-    );
+  const handleReject = (index) => {
+    const updated = [...bookings];
+    updated[index].status = "REJECTED";
+    setBookings(updated);
   };
+
+  const pending = bookings.filter(
+    (b) => b.status === "PENDING_STAFF"
+  );
 
   return (
-    <>
-      <Navbar role="staff" />
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2>Staff Approvals</h2>
+    <Layout>
+      <h2>Staff Approval</h2>
 
-          {bookings.map((b) => (
-            <div key={b.id}>
-              <p>{b.student} - {b.resource}</p>
-              <button onClick={() => approve(b.id)}>Approve</button>
-              <button onClick={() => reject(b.id)}>Reject</button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
+      {pending.length === 0 ? (
+        <p>No pending student requests.</p>
+      ) : (
+        pending.map((b, i) => (
+          <div key={i} style={styles.card}>
+            <h3>{b.resource}</h3>
+            <p>
+              {b.date} at {b.time}
+            </p>
+            <p>Status: {b.status}</p>
+
+            <button
+              style={styles.button}
+              onClick={() => handleApprove(i)}
+            >
+              Approve
+            </button>
+
+            <button
+              style={{ ...styles.button, background: "red" }}
+              onClick={() => handleReject(i)}
+            >
+              Reject
+            </button>
+          </div>
+        ))
+      )}
+    </Layout>
   );
 };
 

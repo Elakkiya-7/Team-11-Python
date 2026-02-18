@@ -1,53 +1,97 @@
 import React, { useState } from "react";
-import Navbar from "../components/Navbar";
+import Layout from "../components/Layout";
 import { styles } from "../styles";
+import { useLocation } from "react-router-dom";
 
-const BookingList = () => {
-  const [bookings] = useState([
-    {
-      id: 1,
-      resource: "Lab 1",
-      date: "2026-03-01",
-      status: "PENDING_STAFF",
-    },
-    {
-      id: 2,
-      resource: "Classroom",
-      date: "2026-03-03",
-      status: "APPROVED",
-    },
-  ]);
+const BookingForm = ({ bookings, setBookings }) => {
+  const location = useLocation();
+
+  // Safe role extraction
+  const role = location.state?.role || "student";
+
+  const [form, setForm] = useState({
+    resource: "",
+    date: "",
+    time: "",
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Check double booking
+    const exists = bookings.find(
+      (b) =>
+        b.resource === form.resource &&
+        b.date === form.date &&
+        b.time === form.time
+    );
+
+    if (exists) {
+      alert("Resource already booked for this time slot.");
+      return;
+    }
+
+    // Status logic
+    let status = "PENDING_STAFF";
+
+    if (role === "staff") status = "PENDING_ADMIN";
+    if (role === "admin") status = "APPROVED";
+
+    const newBooking = {
+      ...form,
+      role,
+      status,
+    };
+
+    setBookings([...bookings, newBooking]);
+
+    alert(`Booking created with status: ${status}`);
+  };
 
   return (
-    <>
-      <Navbar role="student" />
+    <Layout>
+      <div style={styles.centerCard}>
+        <h2>Book Resource ({role})</h2>
 
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2 style={styles.title}>My Bookings</h2>
+        <form onSubmit={handleSubmit}>
+          <select
+            style={styles.input}
+            required
+            onChange={(e) =>
+              setForm({ ...form, resource: e.target.value })
+            }
+          >
+            <option value="">Select Resource</option>
+            <option>Lab</option>
+            <option>Classroom</option>
+            <option>Event Hall</option>
+          </select>
 
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Resource</th>
-                <th style={styles.th}>Date</th>
-                <th style={styles.th}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((b) => (
-                <tr key={b.id}>
-                  <td style={styles.td}>{b.resource}</td>
-                  <td style={styles.td}>{b.date}</td>
-                  <td style={styles.td}>{b.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <input
+            type="date"
+            style={styles.input}
+            required
+            onChange={(e) =>
+              setForm({ ...form, date: e.target.value })
+            }
+          />
+
+          <input
+            type="time"
+            style={styles.input}
+            required
+            onChange={(e) =>
+              setForm({ ...form, time: e.target.value })
+            }
+          />
+
+          <button style={styles.button}>
+            Submit Booking
+          </button>
+        </form>
       </div>
-    </>
+    </Layout>
   );
 };
 
-export default BookingList;
+export default BookingForm;

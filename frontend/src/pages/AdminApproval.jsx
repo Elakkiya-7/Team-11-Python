@@ -1,88 +1,56 @@
-import React, { useEffect, useState } from "react";
-import axiosInstance from "../api/axiosInstance";
-import Navbar from "../components/Navbar";
+import React from "react";
+import Layout from "../components/Layout";
+import { styles } from "../styles";
 
-const AdminApproval = () => {
-  const [bookings, setBookings] = useState([]);
-
-  // Fetch all pending bookings
-  const fetchBookings = async () => {
-    try {
-      const res = await axiosInstance.get("bookings/");
-      setBookings(res.data);
-    } catch (error) {
-      console.error(error);
-    }
+const AdminApproval = ({ bookings, setBookings }) => {
+  const handleApprove = (index) => {
+    const updated = [...bookings];
+    updated[index].status = "APPROVED";
+    setBookings(updated);
   };
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
-  const updateStatus = async (id, status) => {
-    try {
-      await axiosInstance.patch(`bookings/${id}/`, {
-        status: status,
-      });
-
-      fetchBookings(); // refresh list
-    } catch (error) {
-      console.error(error);
-    }
+  const handleReject = (index) => {
+    const updated = [...bookings];
+    updated[index].status = "REJECTED";
+    setBookings(updated);
   };
+
+  const pending = bookings.filter(
+    (b) => b.status === "PENDING_ADMIN"
+  );
 
   return (
-    <>
-      <Navbar />
-      <div style={{ padding: "30px" }}>
-        <h2>Admin Booking Approval</h2>
+    <Layout>
+      <h2>Admin Approval</h2>
 
-        <table border="1" width="100%" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Resource</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+      {pending.length === 0 ? (
+        <p>No pending approvals.</p>
+      ) : (
+        pending.map((b, i) => (
+          <div key={i} style={styles.card}>
+            <h3>{b.resource}</h3>
+            <p>
+              {b.date} at {b.time}
+            </p>
+            <p>Status: {b.status}</p>
 
-          <tbody>
-            {bookings.map((b) => (
-              <tr key={b.id}>
-                <td>{b.userId}</td>
-                <td>{b.resourceId}</td>
-                <td>{b.bookingDate}</td>
-                <td>{b.status}</td>
+            <button
+              style={styles.button}
+              onClick={() => handleApprove(i)}
+            >
+              Approve
+            </button>
 
-                <td>
-                  {b.status === "PENDING" && (
-                    <>
-                      <button
-                        onClick={() =>
-                          updateStatus(b.id, "APPROVED")
-                        }
-                      >
-                        Approve
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          updateStatus(b.id, "REJECTED")
-                        }
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+            <button
+              style={{ ...styles.button, background: "red" }}
+              onClick={() => handleReject(i)}
+            >
+              Reject
+            </button>
+          </div>
+        ))
+      )}
+    </Layout>
   );
 };
 

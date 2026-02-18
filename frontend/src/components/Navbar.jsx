@@ -1,53 +1,20 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { styles } from "../styles";
 
-const Navbar = ({ role }) => {
-  const navigate = useNavigate();
+const Navbar = () => (
+  <div style={styles.navbar}>
+    <h2 style={{ margin: 0 }}>Campus Resource Management</h2>
 
-  return (
-    <div style={styles.navbar}>
-      <h3 style={{ margin: 0 }}>Campus Resource System</h3>
-
-      <div>
-        {role === "student" && (
-          <>
-            <button onClick={() => navigate("/book-resource")}>
-              Book
-            </button>
-            <button onClick={() => navigate("/bookings")}>
-              My Bookings
-            </button>
-          </>
-        )}
-
-        {role === "staff" && (
-          <button onClick={() => navigate("/staff-approvals")}>
-            Staff Approvals
-          </button>
-        )}
-
-        {role === "admin" && (
-          <button onClick={() => navigate("/admin-approvals")}>
-            Admin Approvals
-          </button>
-        )}
-
-        <button onClick={() => navigate("/")}>Logout</button>
-      </div>
+    <div>
+      <Link to="/" style={{ color: "white", marginRight: 20 }}>
+        Home
+      </Link>
+      <Link to="/register" style={{ color: "white" }}>
+        Register
+      </Link>
     </div>
-  );
-};
-
-const styles = {
-  navbar: {
-    width: "100%",
-    padding: "15px 30px",
-    background: "#1e1e2f",
-    color: "#fff",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-};
+  </div>
+);
 
 export default Navbar;
