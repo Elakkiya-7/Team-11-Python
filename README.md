@@ -271,4 +271,4 @@ Campus Resource Management System
 
 ---
 
-**Happy Coding! 🚀**
+
