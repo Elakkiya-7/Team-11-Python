@@ -1,6 +1,6 @@
 // Development mode configuration
 // Set this to true to enable mock data when backend is not available
-export const DEV_MODE = true;
+export const DEV_MODE = false; // DISABLED - Using real backend
 
 // Mock user data for development
 export const MOCK_USERS = {

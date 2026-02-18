@@ -9,7 +9,7 @@ import ErrorMessage from "../components/ErrorMessage";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, backendAvailable } = useAuth();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     username: "",
@@ -22,13 +22,8 @@ const Login = () => {
     e.preventDefault();
     setError(null);
 
-    if (!validateEmail(form.username)) {
-      setError("Enter valid email address");
-      return;
-    }
-
-    if (!validatePassword(form.password)) {
-      setError("Password must be 8+ chars with uppercase, lowercase, number, and special char");
+    if (!form.username || !form.password) {
+      setError("Please enter both username and password");
       return;
     }
 
@@ -71,33 +66,17 @@ const Login = () => {
           <p style={{ color: '#718096', fontSize: '15px' }}>Sign in to your account</p>
         </div>
 
-        {!backendAvailable && (
-          <div style={{
-            backgroundColor: '#fff3cd',
-            color: '#856404',
-            padding: '12px 16px',
-            borderRadius: '10px',
-            marginBottom: '20px',
-            fontSize: '13px',
-            border: '1px solid #ffc107'
-          }}>
-            ⚠️ Backend server not detected. Using demo mode.
-            <br />
-            <small>Try: student@example.com / staff@example.com / admin@example.com</small>
-          </div>
-        )}
-
         {error && <ErrorMessage message={error} />}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '8px' }}>
             <label style={{ display: 'block', marginBottom: '8px', color: '#4a5568', fontWeight: '600', fontSize: '14px' }}>
-              Email Address
+              Username or Email
             </label>
             <input
               style={styles.input}
-              type="email"
-              placeholder="Enter your email"
+              type="text"
+              placeholder="Enter your username or email"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
               required

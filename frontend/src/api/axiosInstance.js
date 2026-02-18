@@ -2,14 +2,9 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "http://127.0.0.1:8000/api/",
-});
-
-axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Token ${token}`;
-  }
-  return config;
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Request interceptor to add auth token
@@ -17,7 +12,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Token ${token}`;
     }
     return config;
   },
@@ -41,9 +36,13 @@ axiosInstance.interceptors.response.use(
       }
     }
     
-    // Log network errors for debugging
-    if (!error.response) {
-      console.error('Network Error: Backend server may not be running at http://127.0.0.1:8000');
+    // Log errors for debugging
+    if (error.response) {
+      console.error('API Error:', error.response.status, error.response.data);
+    } else if (error.request) {
+      console.error('Network Error: No response received. Is the backend running at http://127.0.0.1:8000?');
+    } else {
+      console.error('Error:', error.message);
     }
     
     return Promise.reject(error);
