@@ -3,7 +3,7 @@
 A Full Stack Web Application built using:
 
 - 🔹 Frontend: React.js
-- 🔹 Backend: Django + Django REST Framework
+- 🔹 Backend: Python + Django REST Framework
 - 🔹 Database: MySQL
 - 🔹 Authentication: Token Based Authentication
 - 🔹 API Testing: Postman
